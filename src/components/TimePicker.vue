@@ -1,7 +1,6 @@
 <script setup>
 	import {
 		ref,
-		watch,
 		onMounted,
 		onUnmounted
 	} from 'vue';
@@ -9,6 +8,7 @@
 	import {
 		debounce
 	} from 'lodash';
+
 	import moment from 'moment';
 
 	const fillZero = (el) => `0${el}`.slice(-2);
@@ -27,8 +27,8 @@
 	const minute = ref(0);
 	const houerRef = ref();
 	const minuteRef = ref();
-	
-	const handleScroll = function(event){
+
+	const handleScroll = debounce(function(event) {
 		const cur = Math.ceil((event.target.scrollTop + 90) / 30) - 2;
 		if (isHouerRef(event)) {
 			houer.value = cur;
@@ -36,28 +36,20 @@
 			minute.value = cur;
 		}
 		scrollTo(cur, event.target);
-	}
+	}, 100)
 
 	onMounted(() => {
 		let now = moment();
 		houer.value = now.hour();
 		minute.value = now.minute();
-		houerRef.value.addEventListener('scroll', debounce(handleScroll, 200));
-		minuteRef.value.addEventListener('scroll', debounce(handleScroll, 200));
+		houerRef.value.addEventListener('scroll', handleScroll);
+		minuteRef.value.addEventListener('scroll', handleScroll);
 	});
 
 	onUnmounted(() => {
 		houerRef.value.removeEventListener('scroll', handleScroll);
 		minuteRef.value.removeEventListener('scroll', handleScroll);
 	})
-
-	watch(houer, () => {
-		scrollTo(houer.value, houerRef.value);
-	});
-
-	watch(minute, () => {
-		scrollTo(minute.value, minuteRef.value);
-	});
 
 	const scrollTo = (val, houerRef) => {
 		houerRef.scrollTo(0, (val - 1) * 30)
@@ -72,8 +64,10 @@
 		if (e.target.getAttribute('data-index')) {
 			if (isHouerRef(e)) {
 				houer.value = Number(e.target.getAttribute('data-index'));
+				scrollTo(houer.value, houerRef.value);
 			} else {
 				minute.value = Number(e.target.getAttribute('data-index'));
+				scrollTo(minute.value, minuteRef.value);
 			}
 		}
 	}

@@ -49,7 +49,7 @@
 	}
 
 	const onDayClick = (e) => {
-		const curTime = daySize.value[e.target.getAttribute('data-index')].date;
+		const curTime = dayList.value[e.target.getAttribute('data-index')].date;
 		if (e.target.classList.contains('active')) {
 			const index = state.value.findIndex(el => el.isSame(curTime));
 			state.value.splice(index, 1);
@@ -69,7 +69,7 @@
 		state.value.push(curTime);
 	}
 
-	const daySize = computed(() => {
+	const dayList = computed(() => {
 		let firstDayOfMonth = moment(curtime.value).clone().startOf('month');
 		let lastDayOfMonth = moment(curtime.value).clone().endOf('month');
 		let daysInMonth = lastDayOfMonth.diff(firstDayOfMonth, 'days') + 1;
@@ -113,7 +113,7 @@
 						includeFirst : el.date && state.value.length === 2 && state.value[0].isSame(el.date),
 						includeLast : el.date && state.value.length === 2 && state.value[1].isSame(el.date),
 						active:el.date && state.value.findIndex(v => v.isSame(el.date)) > -1
-					}" v-for="(el,i) in daySize" :key="el.date">{{ el.value ? el.value:null }}</span>
+					}" v-for="(el,i) in dayList" :key="el.date">{{ el.value ? el.value:null }}</span>
 			</div>
 		</div>
 		<div class="bottom">
